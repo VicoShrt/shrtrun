@@ -30,6 +30,14 @@ get_config_value() {
     fi
 }
 
+save_to_history() {
+    cmd="$1"
+    LAST_HISTORY=$(tail -n 1 "$HISTORY_FILE" 2>/dev/null)
+    if [ "$cmd" != "$LAST_HISTORY" ]; then
+        echo "$cmd" >> "$HISTORY_FILE"
+    fi
+}
+
 # Get configuration values
 SEARCH_ENGINE=$(get_config_value "search_engine" "https://duckduckgo.com/?q=")
 YOUTUBE_SEARCH=$(get_config_value "youtube_search" "https://www.youtube.com/results?search_query=")
@@ -72,13 +80,6 @@ source "$HOME/.profile" 2>/dev/null
 source "$HOME/.bashrc" 2>/dev/null
 source "$HOME/.bashrc_aliases" 2>/dev/null
 
-# Avoid duplicate consecutive entries
-if [ -n "$USER_INPUT" ]; then
-    LAST_HISTORY=$(tail -n 1 "$HISTORY_FILE")
-    if [ "$USER_INPUT" != "$LAST_HISTORY" ]; then
-        echo "$USER_INPUT" >> "$HISTORY_FILE"
-    fi
-fi
 
 # Check for command
 if [[ "$USER_INPUT" == \!* ]]; then
@@ -94,7 +95,7 @@ if [[ "$USER_INPUT" == \!* ]]; then
             xdg-open "$SEARCH_URL" &> /dev/null &
             disown
             # Append to history
-            echo "$USER_INPUT" >> "$HISTORY_FILE"
+            save_to_history "$USER_INPUT"
             ;;
         y)
             # YouTube search
@@ -103,7 +104,7 @@ if [[ "$USER_INPUT" == \!* ]]; then
             xdg-open "$YOUTUBE_URL" &>/dev/null &
             disown
             # Append to history
-            echo "$USER_INPUT" >> "$HISTORY_FILE"
+            save_to_history "$USER_INPUT"
             ;;
         *)
             show_notification "Unknown Command" "The command '$CMD_TYPE' is not recognized"
@@ -116,7 +117,7 @@ else
     # Execute in background and disown
     if eval "$USER_INPUT" &>/dev/null & then
         disown
-        echo "$USER_INPUT" >> "$HISTORY_FILE"
+        save_to_history "$USER_INPUT"
     else
         show_notification "Command Failed" "'$USER_INPUT' could not be executed."
     fi
