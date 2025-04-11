@@ -36,6 +36,10 @@ BROWSER=$(get_config_value "browser" "firefox")
 SEARCH_ENGINE=$(get_config_value "search_engine" "https://duckduckgo.com/?q=")
 YOUTUBE_SEARCH=$(get_config_value "youtube_search" "https://www.youtube.com/results?search_query=")
 LOG_FILE=$(get_config_value "log_file" "/.logs/shrtrun.log")
+HISTORY_FILE="$CONFIG_DIR/history.txt"
+
+# Create history file if it doesn't exist
+touch "$HISTORY_FILE"
 
 # Check if log file exists
 if [ ! -f "$LOG_FILE" ]; then
@@ -55,7 +59,7 @@ show_notification() {
 }
 
 # Get user input from rofi
-USER_INPUT=$(rofi -dmenu -p "Run:")
+USER_INPUT=$(tac "$HISTORY_FILE" | rofi -dmenu -p "Run:")
 
 # Exit if user didn't enter anything
 if [ -z "$USER_INPUT" ]; then
@@ -69,6 +73,14 @@ echo "$(date): User input: '$USER_INPUT'" >> "$LOG_FILE"
 source "$HOME/.profile" 2>/dev/null
 source "$HOME/.bashrc" 2>/dev/null
 source "$HOME/.bashrc_aliases" 2>/dev/null
+
+# Avoid duplicate consecutive entries
+if [ -n "$USER_INPUT" ]; then
+    LAST_HISTORY=$(tail -n 1 "$HISTORY_FILE")
+    if [ "$USER_INPUT" != "$LAST_HISTORY" ]; then
+        echo "$USER_INPUT" >> "$HISTORY_FILE"
+    fi
+fi
 
 # Check for command
 if [[ "$USER_INPUT" == \!* ]]; then
@@ -97,6 +109,8 @@ if [[ "$USER_INPUT" == \!* ]]; then
                 done
             fi
             disown
+            # Append to history
+            echo "$USER_INPUT" >> "$HISTORY_FILE"
             ;;
         y)
             # YouTube search
@@ -104,6 +118,8 @@ if [[ "$USER_INPUT" == \!* ]]; then
             echo "$(date): Opening YouTube search: $YOUTUBE_URL" >> "$LOG_FILE"
             xdg-open "$YOUTUBE_URL" &>/dev/null &
             disown
+            # Append to history
+            echo "$USER_INPUT" >> "$HISTORY_FILE"
             ;;
         *)
             show_notification "Unknown Command" "The command '$CMD_TYPE' is not recognized"
@@ -114,6 +130,10 @@ else
     echo "$(date): Executing command: $USER_INPUT" >> "$LOG_FILE"
     
     # Execute in background and disown
-    eval "$USER_INPUT" &>/dev/null &
-    disown
+    if eval "$USER_INPUT" &>/dev/null & then
+        disown
+        echo "$USER_INPUT" >> "$HISTORY_FILE"
+    else
+        show_notification "Command Failed" "'$USER_INPUT' could not be executed."
+    fi
 fi
