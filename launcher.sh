@@ -11,7 +11,7 @@ mkdir -p "$CONFIG_DIR"
 if [ ! -f "$CONFIG_FILE" ]; then
     cat > "$CONFIG_FILE" << EOF
 # Quick Launcher Configuration
-log_file: /logs/shrtrun.log
+log_file: /.logs/shrtrun.log
 search_engine: https://duckduckgo.com/?q=
 youtube_search: https://www.youtube.com/results?search_query=
 EOF

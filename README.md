@@ -48,6 +48,8 @@ search_engine: https://duckduckgo.com/?q=
 youtube_search: https://www.youtube.com/results?search_query=
 ```
 
+Info: file paths are relative to your home directory.
+
 ## 🧑‍💻 Usage
 
 - 💬 **Regular Commands:** Type any shell command and hit Enter to execute it.
