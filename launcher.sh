@@ -12,7 +12,6 @@ if [ ! -f "$CONFIG_FILE" ]; then
     cat > "$CONFIG_FILE" << EOF
 # Quick Launcher Configuration
 log_file: /logs/shrtrun.log
-browser: firefox
 search_engine: https://duckduckgo.com/?q=
 youtube_search: https://www.youtube.com/results?search_query=
 EOF
@@ -32,7 +31,6 @@ get_config_value() {
 }
 
 # Get configuration values
-BROWSER=$(get_config_value "browser" "firefox")
 SEARCH_ENGINE=$(get_config_value "search_engine" "https://duckduckgo.com/?q=")
 YOUTUBE_SEARCH=$(get_config_value "youtube_search" "https://www.youtube.com/results?search_query=")
 LOG_FILE=$(get_config_value "log_file" "/.logs/shrtrun.log")
@@ -93,21 +91,7 @@ if [[ "$USER_INPUT" == \!* ]]; then
             # Format the search URL
             SEARCH_URL="${SEARCH_ENGINE}${QUERY// /+}"
             echo "$(date): Opening search URL: $SEARCH_URL" >> "$LOG_FILE"
-            
-            # Try multiple methods to open the browser
-            if command -v "$BROWSER" &> /dev/null; then
-                "$BROWSER" "$SEARCH_URL" &
-            elif command -v xdg-open &> /dev/null; then
-                xdg-open "$SEARCH_URL" &
-            else
-                # Try common browsers
-                for browser in firefox google-chrome chromium-browser brave-browser; do
-                    if command -v "$browser" &> /dev/null; then
-                        "$browser" "$SEARCH_URL" &
-                        break
-                    fi
-                done
-            fi
+            xdg-open "$SEARCH_URL" &> /dev/null &
             disown
             # Append to history
             echo "$USER_INPUT" >> "$HISTORY_FILE"

@@ -44,7 +44,6 @@ On first run, the script creates a config file at:
 
 ```
 log_file: /logs/shrtrun.log
-browser: firefox
 search_engine: https://duckduckgo.com/?q=
 youtube_search: https://www.youtube.com/results?search_query=
 ```
@@ -76,14 +75,8 @@ This lets you recall previous commands easily when relaunching shrtrun. Only suc
 - 🐧 **Debian/Ubuntu:** `sudo apt install rofi xdg-utils libnotify-bin`
 - 🐧 **Arch/Manjaro:** `sudo pacman -S rofi xdg-utils libnotify`
 - 🐧 **Fedora:** `sudo dnf install rofi xdg-utils libnotify`
-
-## 🎨 Customization Ideas
-
-- ➕ Add new command prefixes (e.g., `!r` for Reddit)
-- 🎨 Change styling in `rofi` config
-- 🌐 Sync history across machines
+- 🐧 **openSUSE:** `sudo zypper install rofi xdg-utils libnotify`
 
 ---
 
 📝 **GPL License** – This project is licensed under the GNU General Public License. See the LICENSE file for more details. 🧾
-
